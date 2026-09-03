@@ -5,8 +5,23 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/logo.svg" />
   <link rel="manifest" href="/manifest.webmanifest" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MediTracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>MediReminder — Daily medicine reminders & tracking</title>
+  <script>
+    // Apply the saved theme before first paint to avoid a flash.
+    try {
+      var raw = localStorage.getItem("medireminder:v1");
+      if (raw) {
+        var data = JSON.parse(raw);
+        var t = data && data.settings && data.settings.theme;
+        var dark =
+          t === "dark" ||
+          (t !== "light" &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches);
+        if (dark) document.documentElement.classList.add("dark");
+      }
+    } catch (e) {}
+  </script>
 </head>
 
 
