@@ -219,12 +219,12 @@ export default function HistoryPage() {
               </p>
             ) : (
               <>
-                <div className="mt-4 flex h-32 items-end gap-2">
+                <div className="mt-4 flex h-36 items-end gap-2">
                   {week.map((d) => {
                     const dayTotal = d.taken + d.skipped + d.missed;
-                    const hTaken = (d.taken / maxDay) * 100;
-                    const hSkipped = (d.skipped / maxDay) * 100;
-                    const hMissed = (d.missed / maxDay) * 100;
+                    const hTaken = Math.round((d.taken / maxDay) * 100);
+                    const hSkipped = Math.round((d.skipped / maxDay) * 100);
+                    const hMissed = Math.round((d.missed / maxDay) * 100);
                     const isToday = d.date === today;
                     return (
                       <div
@@ -232,13 +232,15 @@ export default function HistoryPage() {
                         className="flex flex-1 flex-col items-center gap-1.5"
                         title={`${d.date}: ${d.taken} taken, ${d.skipped} skipped, ${d.missed} missed`}
                       >
-                        <div className="flex w-full flex-1 flex-col-reverse justify-start">
-                          {dayTotal > 0 ? (
-                            <div className="flex w-full flex-col justify-end overflow-hidden rounded-md bg-muted/40">
-                              {hTaken > 0 && (
+                        <div className="flex h-28 w-full flex-col justify-end overflow-hidden rounded-md bg-muted/40">
+                          {dayTotal === 0 ? (
+                            <div className="h-1 w-full rounded-full bg-muted/50" />
+                          ) : (
+                            <>
+                              {hMissed > 0 && (
                                 <div
-                                  className="w-full bg-foreground"
-                                  style={{ height: `${hTaken}%` }}
+                                  className="w-full bg-red-400/70"
+                                  style={{ height: `${hMissed}%` }}
                                 />
                               )}
                               {hSkipped > 0 && (
@@ -247,15 +249,13 @@ export default function HistoryPage() {
                                   style={{ height: `${hSkipped}%` }}
                                 />
                               )}
-                              {hMissed > 0 && (
+                              {hTaken > 0 && (
                                 <div
-                                  className="w-full bg-red-400/70"
-                                  style={{ height: `${hMissed}%` }}
+                                  className="w-full bg-foreground"
+                                  style={{ height: `${hTaken}%` }}
                                 />
                               )}
-                            </div>
-                          ) : (
-                            <div className="h-1 w-full rounded-full bg-muted/50" />
+                            </>
                           )}
                         </div>
                         <span

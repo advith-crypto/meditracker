@@ -23,6 +23,14 @@ import {
 const STORAGE_KEY = "medireminder:v1";
 const DB_VERSION = 1;
 
+function localDateToday(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 export const DEFAULT_SETTINGS: AppSettings = {
   onboarded: false,
   notificationsEnabled: true,
@@ -96,7 +104,7 @@ function sanitizeDB(raw: unknown): DB {
             : [],
           startDate: /^\d{4}-\d{2}-\d{2}$/.test(m.startDate || "")
             ? m.startDate
-            : new Date().toISOString().slice(0, 10),
+            : localDateToday(),
           endDate:
             m.endDate && /^\d{4}-\d{2}-\d{2}$/.test(m.endDate) ? m.endDate : null,
           mealInstruction: ["none", "before", "after", "with", "empty"].includes(
@@ -171,6 +179,8 @@ function loadDB(): DB {
 /* ------------------------------------------------------------------ */
 
 let db: DB = loadDB();
+/** Serialized snapshot used to skip redundant writes/re-renders. */
+let lastJson: string | null = JSON.stringify(db);
 const listeners = new Set<() => void>();
 
 function emit() {
@@ -206,8 +216,11 @@ function cloneDB(source: DB): DB {
 export function mutate(fn: (draft: DB) => DB): void {
   const draft = cloneDB(db);
   const next = fn(draft);
+  const json = JSON.stringify(next);
+  if (json === lastJson) return; // nothing actually changed
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    localStorage.setItem(STORAGE_KEY, json);
+    lastJson = json;
   } catch (err) {
     console.error("[MediTracker] Failed to persist data:", err);
     toast.error("Your data could not be saved. Please try again.");
@@ -309,7 +322,8 @@ export function actionDeleteMedicine(id: string): void {
     });
     draft.snoozes = draft.snoozes.filter((s) => {
       const dose = draft.doses.find((d) => d.id === s.doseId);
-      return !dose || dose.medicineId !== id;
+      // Drop snoozes whose dose was removed; keep snoozes for other medicines.
+      return dose !== undefined && dose.medicineId !== id;
     });
     return draft;
   });
@@ -376,7 +390,7 @@ export function actionDeleteAllMedicines(): void {
 }
 
 export function actionAddSampleData(): void {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateToday();
   const first = buildMedicine({
     name: "Paracetamol",
     dosage: "500 mg",

@@ -15,6 +15,7 @@ import { AlarmClock, Check, Pill, SkipForward } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
+  DOSE_GRACE_MS,
   type DB,
   formatTime12,
   parseLocalDateTime,
@@ -40,7 +41,6 @@ import {
 import { Button } from "@/components/ui/button";
 
 const TICK_MS = 30_000;
-const DUE_GRACE_MS = 5 * 60_000;
 
 function dueDoses(db: DB, nowMs: number): Dose[] {
   const meds = new Map(db.medicines.map((m) => [m.id, m]));
@@ -50,7 +50,7 @@ function dueDoses(db: DB, nowMs: number): Dose[] {
     const med = meds.get(d.medicineId);
     if (!med || med.paused || !med.reminderEnabled) continue;
     const t = parseLocalDateTime(d.scheduledAt).getTime();
-    if (t <= nowMs && nowMs - t <= DUE_GRACE_MS) out.push(d);
+    if (t <= nowMs && nowMs - t <= DOSE_GRACE_MS) out.push(d);
   }
   return out;
 }

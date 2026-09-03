@@ -241,6 +241,12 @@ export function dosageText(m: Pick<Medicine, "dosage" | "unit">): string {
 export const SCHEDULE_BACK_DAYS = 92;
 export const SCHEDULE_FORWARD_DAYS = 92;
 
+/**
+ * How long after a dose's scheduled time it may still fire a reminder before
+ * being considered missed. Must stay in sync with the scheduler's grace period.
+ */
+export const DOSE_GRACE_MS = 5 * 60_000;
+
 /** Does this medicine have a scheduled dose on `dateStr` at `time`? */
 export function isScheduledOn(m: Medicine, dateStr: string, time: string): boolean {
   if (dateStr < m.startDate) return false;
@@ -354,8 +360,10 @@ export function syncDoses(db: DB): DB {
     );
     if (stillScheduled) {
       existingByKey.set(key, d);
-    } else if (isPast) {
-      out.push(d); // schedule changed later — keep the historical record
+    } else if (isPast || d.status !== "upcoming") {
+      // Keep history: past doses, or recorded doses (taken/skipped/missed)
+      // even if their time hasn't passed yet and the schedule changed.
+      out.push(d);
     }
   }
 
@@ -392,14 +400,19 @@ export function syncDoses(db: DB): DB {
     if (!seen.has(key)) out.push(g);
   }
 
-  // Mark overdue upcoming doses as missed (skip paused medicines — their
+  // Mark overdue upcoming doses as missed — but only after the reminder grace
+  // window has passed, so a dose that is a minute late still fires its reminder
+  // instead of silently becoming missed. Doses with an active snooze wait for
+  // the snoozed reminder. Paused medicines are never marked missed (their
   // future schedule is suspended, not failed).
+  const snoozedDoseIds = new Set(db.snoozes.map((s) => s.doseId));
   let changed = false;
   for (const d of out) {
     if (d.status !== "upcoming") continue;
     const med = medicineById.get(d.medicineId);
     if (med?.paused) continue;
-    if (parseLocalDateTime(d.scheduledAt).getTime() <= nowMs) {
+    if (snoozedDoseIds.has(d.id)) continue;
+    if (nowMs - parseLocalDateTime(d.scheduledAt).getTime() > DOSE_GRACE_MS) {
       d.status = "missed";
       changed = true;
     }
