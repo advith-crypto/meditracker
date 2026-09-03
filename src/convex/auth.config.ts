@@ -1,12 +1,16 @@
 import type { AuthConfig } from "convex/server";
 
-// Freebuff-signed federated tokens (see freebuff web's
-// src/lib/vly-convex-jwt.ts) let a signed-in freebuff.com user carry their
-// identity into this project without going through local sign-in. customJwt
-// is correct for this provider: freebuff's tokens and JWKS both carry a
-// `kid` header, which the customJwt validation path requires.
-const freebuffIssuer =
-  process.env.VLY_CONVEX_AUTH_ISSUER ?? "https://freebuff.com";
+// Freebuff-signed federated tokens let a signed-in freebuff.com user carry
+// their identity into this project without going through local sign-in.
+// customJwt is correct for this provider: freebuff's tokens and JWKS both
+// carry a `kid` header, which the customJwt validation path requires.
+//
+// Note: the issuer is hardcoded rather than read from
+// process.env.VLY_CONVEX_AUTH_ISSUER because that variable is not set in
+// this deployment — Convex rejects auth configs that reference unset env
+// vars (push fails with HTTP 400), and MediTracker doesn't use Convex auth
+// at all.
+const freebuffIssuer = "https://freebuff.com";
 
 export default {
   providers: [
