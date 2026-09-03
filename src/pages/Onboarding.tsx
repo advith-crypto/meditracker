@@ -17,8 +17,8 @@ import { cn } from "@/lib/utils";
 const STEPS = [
   {
     icon: Bell,
-    title: "Never miss a medicine reminder.",
-    body: "MediReminder keeps your daily medicines organized and reminds you when it’s time to take them.",
+    title: "Never miss a dose again.",
+    body: "MediTracker keeps your daily medicines organized and nudges you when it’s time to take them.",
   },
   {
     icon: Pill,
@@ -27,7 +27,7 @@ const STEPS = [
   },
   {
     icon: CalendarClock,
-    title: "Get reminders and track every dose.",
+    title: "Track every single dose.",
     body: "Mark each dose as taken or skipped, and see your history and adherence at a glance.",
   },
 ];
@@ -68,7 +68,7 @@ export default function Onboarding() {
           <span className="flex size-8 items-center justify-center rounded-lg bg-foreground text-background">
             <Pill className="size-4" />
           </span>
-          <span className="text-[15px] font-semibold tracking-tight">MediReminder</span>
+          <span className="text-[15px] font-semibold tracking-tight">MediTracker</span>
         </div>
         {!isPermissionStep && (
           <button
@@ -114,7 +114,7 @@ export default function Onboarding() {
                   Enable notifications
                 </h1>
                 <p className="mx-auto mt-4 max-w-sm text-[15px] leading-relaxed text-muted-foreground">
-                  MediReminder needs notification permission to remind you when
+                  MediTracker needs notification permission to remind you when
                   it’s time to take your medicine.
                 </p>
 

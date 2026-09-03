@@ -1,5 +1,5 @@
 /**
- * MediReminder — reminder event bus, chime and system notification helpers.
+ * MediTracker — reminder event bus, chime and system notification helpers.
  *
  * The scheduler lives in ReminderProvider; this module is the channel between
  * the scheduler and the in-app reminder panel, plus the platform bits
@@ -136,7 +136,7 @@ export function fireSystemNotification(
 ): void {
   if (!notificationsSupported() || notificationPermission() !== "granted") return;
   try {
-    const n = new Notification("MediReminder", {
+    const n = new Notification("MediTracker", {
       body: `It's time to take ${medicineName} — ${dosageText}.`,
       tag: `dose-${doseId}`,
       icon: "/logo.svg",

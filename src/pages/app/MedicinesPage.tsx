@@ -184,8 +184,8 @@ export default function MedicinesPage() {
             </EmptyTitle>
             <EmptyDescription>
               {query || filter !== "all"
-                ? "Try a different search or filter."
-                : "Add your first medicine to start receiving reminders."}
+                ? "Nothing matches — try a different search or filter."
+                : "Add your first medicine and we’ll take it from there."}
             </EmptyDescription>
           </EmptyHeader>
           {!query && filter === "all" && (

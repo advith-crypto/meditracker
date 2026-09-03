@@ -22,12 +22,11 @@ const NAV = [
 ];
 
 function Logo() {
-  return (
-    <NavLink to="/app" className="flex items-center gap-2.5" aria-label="MediReminder home">
+  return (        <NavLink to="/app" className="flex items-center gap-2.5" aria-label="MediTracker home">
       <span className="flex size-8 items-center justify-center rounded-lg bg-foreground text-background">
         <Pill className="size-4" />
       </span>
-      <span className="text-[15px] font-semibold tracking-tight">MediReminder</span>
+      <span className="text-[15px] font-semibold tracking-tight">MediTracker</span>
     </NavLink>
   );
 }
@@ -81,7 +80,7 @@ export default function AppShell() {
             Add medicine
           </button>
           <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
-            Reminders and tracking only — not medical advice.
+            Reminders and tracking only — never medical advice.
           </p>
         </div>
       </aside>

@@ -1,17 +1,22 @@
+import { useAuthActions } from "@convex-dev/auth/react";
 import {
   Bell,
   Download,
   FlaskConical,
   Info,
+  LogOut,
   Moon,
   Pill,
   ShieldCheck,
   Sun,
   Trash2,
   Monitor,
+  UserRound,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/use-auth";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -96,10 +101,22 @@ export default function SettingsPage() {
   const db = useDB();
   const s = db.settings;
   const perm = notificationPermission();
+  const { user } = useAuth();
+  const { signOut } = useAuthActions();
+  const navigate = useNavigate();
 
   const [confirm, setConfirm] = useState<
     "clearHistory" | "deleteAll" | null
   >(null);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate("/");
+    } catch {
+      toast.error("Could not sign out. Please try again.");
+    }
+  };
 
   const themeOptions: { value: ThemePref; label: string; icon: typeof Sun }[] = [
     { value: "light", label: "Light", icon: Sun },
@@ -128,9 +145,33 @@ export default function SettingsPage() {
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Reminders, appearance, data and privacy.
+          Your account, reminders, appearance, data and privacy.
         </p>
       </header>
+
+      {/* Account */}
+      <section className="space-y-3">
+        <SectionHeading title="Account" />
+        <Section>
+          <div className="divide-y divide-border">
+            <Row
+              icon={<UserRound className="size-4" />}
+              title="Signed in as"
+              description={
+                user?.email
+                  ? user.email
+                  : user?.isAnonymous
+                    ? "Guest account — instant access, no email needed"
+                    : "Signed in"
+              }
+            >
+              <Button size="sm" variant="outline" onClick={handleSignOut}>
+                <LogOut className="size-3.5" /> Sign out
+              </Button>
+            </Row>
+          </div>
+        </Section>
+      </section>
 
       {/* Notifications */}
       <section className="space-y-3">
@@ -217,8 +258,8 @@ export default function SettingsPage() {
         </Section>
         <p className="px-1 text-xs leading-relaxed text-muted-foreground">
           Reminders appear as in-app alerts and system notifications while
-          MediReminder is open in this browser. Browsers cannot deliver reminders
-          after the app is closed, so keep MediReminder open when you expect a
+          MediTracker is open in this browser. Browsers cannot deliver reminders
+          after the app is closed, so keep MediTracker open when you expect a
           reminder.
         </p>
       </section>
@@ -231,7 +272,7 @@ export default function SettingsPage() {
             <Row
               icon={<Sun className="size-4" />}
               title="Theme"
-              description="Choose how MediReminder looks."
+              description="Choose how MediTracker looks."
             >
               <div className="flex rounded-lg border border-border bg-background p-0.5">
                 {themeOptions.map((o) => (
@@ -326,13 +367,13 @@ export default function SettingsPage() {
                 <Pill className="size-6" />
               </span>
               <div className="min-w-0">
-                <p className="font-semibold">MediReminder</p>
+                <p className="font-semibold">MediTracker</p>
                 <p className="text-sm text-muted-foreground">
                   Version {APP_VERSION}
                 </p>
                 <p className="mt-1 text-sm leading-snug text-muted-foreground">
-                  A simple daily medicine reminder and medication tracking app.
-                  Reminders and tracking only.
+                  A friendly daily medicine reminder and tracking app. Built for
+                  you — simple enough for everyday use.
                 </p>
               </div>
             </div>

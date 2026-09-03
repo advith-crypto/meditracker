@@ -8,20 +8,22 @@ import {
   Lock,
   Pill,
   ShieldCheck,
+  Sparkles,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
 import { useDB } from "@/lib/store";
 
 const STEPS = [
   {
     icon: Pill,
     title: "Add your medicines",
-    body: "Name, dosage, reminder times, meal instructions and notes — in under a minute.",
+    body: "Name, dosage, reminder times, meal instructions and notes — set up in under a minute.",
   },
   {
     icon: Bell,
-    title: "Get reminded",
+    title: "Get a friendly nudge",
     body: "Clear alerts when a dose is due, with one-tap taken, skip and snooze actions.",
   },
   {
@@ -35,17 +37,17 @@ const FEATURES = [
   {
     icon: CalendarClock,
     title: "Flexible schedules",
-    body: "Daily, multiple times a day, or custom days of the week with several reminder times.",
+    body: "Daily, several times a day, or custom days of the week with multiple reminder times.",
   },
   {
     icon: ShieldCheck,
     title: "Private by design",
-    body: "Everything is stored locally on your device. No account, no cloud, no tracking.",
+    body: "Everything is stored locally on your device. No tracking, no cloud, no fuss.",
   },
   {
     icon: Check,
     title: "Simple and clear",
-    body: "Large touch targets, readable type and calm design — easy for everyone.",
+    body: "Large touch targets, readable type and a calm design that’s easy for everyone.",
   },
 ];
 
@@ -101,8 +103,16 @@ function PhoneMock() {
 export default function Landing() {
   const navigate = useNavigate();
   const db = useDB();
+  const { isAuthenticated, isLoading } = useAuth();
 
-  const openApp = () => navigate(db.settings.onboarded ? "/app" : "/onboarding");
+  const openApp = () => {
+    if (isLoading) return;
+    if (!isAuthenticated) {
+      navigate("/auth?returnTo=/app");
+      return;
+    }
+    navigate(db.settings.onboarded ? "/app" : "/onboarding");
+  };
 
   return (
     <div className="min-h-dvh bg-background text-foreground">
@@ -114,7 +124,7 @@ export default function Landing() {
               <Pill className="size-4" />
             </span>
             <span className="text-[15px] font-semibold tracking-tight">
-              MediReminder
+              MediTracker
             </span>
           </div>
           <Button onClick={openApp} className="h-10 px-5">
@@ -135,13 +145,14 @@ export default function Landing() {
               Daily medicine reminders
             </p>
             <h1 className="mt-4 text-4xl font-semibold leading-[1.1] tracking-tight md:text-5xl">
-              Never miss a
+              Never miss
               <br />
-              medicine reminder.
+              a dose again.
             </h1>
             <p className="mt-5 max-w-md text-base leading-relaxed text-muted-foreground md:text-lg">
-              MediReminder keeps your daily medicines organized, reminds you when
-              a dose is due, and tracks whether it was taken, skipped or missed.
+              MediTracker reminds you when it’s time to take your medicine, then
+              tracks whether each dose was taken, skipped or missed — all in one
+              calm, simple place.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Button
@@ -152,13 +163,13 @@ export default function Landing() {
                 Get started <ArrowRight className="size-4" />
               </Button>
               <p className="text-sm text-muted-foreground">
-                No account needed — works right away.
+                Free. No credit card. Set up in minutes.
               </p>
             </div>
             <ul className="mt-8 space-y-2 text-sm text-muted-foreground">
               {[
-                "Free, with no sign-up",
-                "Data stays on your device",
+                "Sign in with email or jump in as a guest",
+                "Your data stays on your device",
                 "Works on phones, tablets and desktop",
               ].map((t) => (
                 <li key={t} className="flex items-center gap-2.5">
@@ -251,13 +262,17 @@ export default function Landing() {
                 Private by design
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
-                Your medicine information never leaves your device. MediReminder
-                stores everything locally, requires no account, and makes no
-                network requests with your data.
+                Your medicine information never leaves your device. MediTracker
+                stores everything locally, requires no personal data beyond an
+                email if you choose one, and never sends your medicines anywhere.
+              </p>
+              <p className="mt-3 flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Sparkles className="size-4" />
+                Guest sign-in works instantly — no email required.
               </p>
             </div>
             <Button size="lg" variant="outline" className="h-12 shrink-0 px-6" onClick={openApp}>
-              Open MediReminder <ArrowRight className="size-4" />
+              Open MediTracker <ArrowRight className="size-4" />
             </Button>
           </div>
         </div>
@@ -271,11 +286,9 @@ export default function Landing() {
               <span className="flex size-7 items-center justify-center rounded-lg bg-foreground text-background">
                 <Pill className="size-3.5" />
               </span>
-              <span className="text-sm font-semibold">MediReminder</span>
+              <span className="text-sm font-semibold">MediTracker</span>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Version 1.0.0
-            </p>
+            <p className="text-xs text-muted-foreground">Version 1.0.0</p>
           </div>
           <p className="max-w-3xl text-xs leading-relaxed text-muted-foreground">
             This app is intended for medication reminders and tracking only. It

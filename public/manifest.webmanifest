@@ -1,6 +1,6 @@
 {
-  "name": "MediReminder",
-  "short_name": "MediReminder",
+  "name": "MediTracker",
+  "short_name": "MediTracker",
   "description": "A simple daily medicine reminder and medication tracking app.",
   "start_url": "/",
   "display": "standalone",

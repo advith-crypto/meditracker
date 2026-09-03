@@ -388,7 +388,7 @@ export default function MedicineFormPage() {
                 ))}
               </div>
               <p className="mt-1.5 text-xs text-muted-foreground">
-                Choose this yourself — MediReminder never decides meal timing.
+                Choose this yourself — MediTracker never decides meal timing.
               </p>
             </div>
 

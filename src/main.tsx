@@ -1,13 +1,19 @@
 import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
+import { ConvexAuthProvider } from "@convex-dev/auth/react";
+import { ConvexReactClient } from "convex/react";
 import React, { StrictMode, useEffect, lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router";
+import { RequireAuth } from "@/components/RequireAuth";
 import { Toaster } from "@/components/ui/sonner";
 import { useDB } from "@/lib/store";
 import "./index.css";
 
+const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
+
 // Lazy load route components for better code splitting
 const Landing = lazy(() => import("./pages/Landing.tsx"));
+const AuthPage = lazy(() => import("./pages/Auth.tsx"));
 const Onboarding = lazy(() => import("./pages/Onboarding.tsx"));
 const AppShell = lazy(() => import("./components/AppShell.tsx"));
 const HomePage = lazy(() => import("./pages/app/HomePage.tsx"));
@@ -59,7 +65,7 @@ class RootErrorBoundary extends React.Component<
     };
   }
   componentDidCatch(err: Error) {
-    console.error("[MediReminder preview] Root crash:", err);
+    console.error("[MediTracker preview] Root crash:", err);
   }
   render() {
     if (this.state.hasError) {
@@ -141,26 +147,43 @@ createRoot(document.getElementById("root")!).render(
       <ToolbarErrorBoundary>
         <VlyToolbar />
       </ToolbarErrorBoundary>
-      <BrowserRouter>
-        <AppTheme />
-        <RouteSyncer />
-        <Suspense fallback={<RouteLoading />}>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/app" element={<AppShell />}>
-              <Route index element={<HomePage />} />
-              <Route path="medicines" element={<MedicinesPage />} />
-              <Route path="medicines/new" element={<MedicineFormPage />} />
-              <Route path="medicines/:id" element={<MedicineDetailPage />} />
-              <Route path="medicines/:id/edit" element={<MedicineFormPage />} />
-              <Route path="history" element={<HistoryPage />} />
-              <Route path="settings" element={<SettingsPage />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
+      <ConvexAuthProvider client={convex}>
+        <BrowserRouter>
+          <AppTheme />
+          <RouteSyncer />
+          <Suspense fallback={<RouteLoading />}>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/auth" element={<AuthPage />} />
+              <Route
+                path="/onboarding"
+                element={
+                  <RequireAuth>
+                    <Onboarding />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/app"
+                element={
+                  <RequireAuth>
+                    <AppShell />
+                  </RequireAuth>
+                }
+              >
+                <Route index element={<HomePage />} />
+                <Route path="medicines" element={<MedicinesPage />} />
+                <Route path="medicines/new" element={<MedicineFormPage />} />
+                <Route path="medicines/:id" element={<MedicineDetailPage />} />
+                <Route path="medicines/:id/edit" element={<MedicineFormPage />} />
+                <Route path="history" element={<HistoryPage />} />
+                <Route path="settings" element={<SettingsPage />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </ConvexAuthProvider>
     </RootErrorBoundary>
   </StrictMode>,
 );

@@ -1,13 +1,13 @@
 /**
- * MediReminder — reminder scheduler + in-app alert panel.
+ * MediTracker — reminder scheduler + in-app alert panel.
  *
- * While the app is open this component checks every 15 seconds for doses that
+ * While the app is open this component checks periodically for doses that
  * are due (or snoozed reminders that have come up), marks long-overdue doses as
  * missed, fires system notifications when permitted, and renders a dismissible
  * alert with Taken / Skip / Snooze actions.
  *
  * Browser limitation (surfaced honestly in the UI): reminders can only fire
- * while MediReminder is open in the browser. There is no background service
+ * while MediTracker is open in the browser. There is no background service
  * that can wake the page when it is closed.
  */
 import { AnimatePresence, motion } from "framer-motion";

@@ -1,5 +1,5 @@
 /**
- * MediReminder — core domain types and pure schedule logic.
+ * MediTracker — core domain types and pure schedule logic.
  *
  * All date math is done in the user's local timezone. Dates are stored as
  * "YYYY-MM-DD" and times as "HH:MM" (24h). Dose timestamps are stored as local

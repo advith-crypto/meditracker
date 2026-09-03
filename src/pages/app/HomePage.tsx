@@ -116,7 +116,8 @@ export default function HomePage() {
             </EmptyMedia>
             <EmptyTitle>No medicines added yet</EmptyTitle>
             <EmptyDescription>
-              Add your first medicine to start receiving reminders.
+              Add your first medicine and we’ll take it from there — the
+              reminders, the tracking, the lot.
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>

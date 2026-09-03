@@ -1,5 +1,5 @@
 /**
- * MediReminder — persistent local store backed by localStorage.
+ * MediTracker — persistent local store backed by localStorage.
  *
  * The whole database is one versioned JSON blob so writes are atomic and a
  * single quota failure is easy to surface. All mutations go through `mutate`,
@@ -161,7 +161,7 @@ function loadDB(): DB {
     if (!raw) return defaultDB();
     return sanitizeDB(JSON.parse(raw));
   } catch (err) {
-    console.warn("[MediReminder] Could not read stored data, starting fresh.", err);
+    console.warn("[MediTracker] Could not read stored data, starting fresh.", err);
     return defaultDB();
   }
 }
@@ -209,7 +209,7 @@ export function mutate(fn: (draft: DB) => DB): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   } catch (err) {
-    console.error("[MediReminder] Failed to persist data:", err);
+    console.error("[MediTracker] Failed to persist data:", err);
     toast.error("Your data could not be saved. Please try again.");
     return;
   }
@@ -419,7 +419,7 @@ export function actionAddSampleData(): void {
 export function exportData(): { ok: boolean } {
   try {
     const payload = {
-      app: "MediReminder",
+      app: "MediTracker",
       exportedAt: new Date().toISOString(),
       medicines: db.medicines,
       doses: db.doses,
@@ -431,14 +431,14 @@ export function exportData(): { ok: boolean } {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `medireminder-export-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `meditracker-export-${new Date().toISOString().slice(0, 10)}.json`;
     document.body.appendChild(a);
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 2000);
     return { ok: true };
   } catch (err) {
-    console.error("[MediReminder] Export failed:", err);
+    console.error("[MediTracker] Export failed:", err);
     return { ok: false };
   }
 }
