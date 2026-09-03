@@ -10,7 +10,7 @@ import {
   Trash2,
   Monitor,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -50,6 +50,18 @@ import {
 import { cn } from "@/lib/utils";
 
 const APP_VERSION = "1.0.0";
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+}
+
+function detectStandalone(): boolean {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    (navigator as { standalone?: boolean }).standalone === true
+  );
+}
 
 function Section({ children, className }: { children: ReactNode; className?: string }) {
   return (
@@ -100,6 +112,39 @@ export default function SettingsPage() {
   const [confirm, setConfirm] = useState<
     "clearHistory" | "deleteAll" | null
   >(null);
+
+  const [installPrompt, setInstallPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
+  const [showInstallHelp, setShowInstallHelp] = useState(false);
+  const [installed, setInstalled] = useState(detectStandalone());
+
+  useEffect(() => {
+    const onPrompt = (event: Event) => {
+      event.preventDefault();
+      setInstallPrompt(event as BeforeInstallPromptEvent);
+    };
+    const onInstalled = () => {
+      setInstalled(true);
+      setInstallPrompt(null);
+      toast.success("MediTracker installed");
+    };
+    window.addEventListener("beforeinstallprompt", onPrompt);
+    window.addEventListener("appinstalled", onInstalled);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", onPrompt);
+      window.removeEventListener("appinstalled", onInstalled);
+    };
+  }, []);
+
+  const handleInstall = async () => {
+    if (installPrompt) {
+      await installPrompt.prompt();
+      const choice = await installPrompt.userChoice;
+      if (choice.outcome === "accepted") setInstallPrompt(null);
+    } else {
+      setShowInstallHelp(true);
+    }
+  };
 
   const themeOptions: { value: ThemePref; label: string; icon: typeof Sun }[] = [
     { value: "light", label: "Light", icon: Sun },
@@ -257,6 +302,39 @@ export default function SettingsPage() {
         </Section>
       </section>
 
+      {/* App */}
+      <section className="space-y-3">
+        <SectionHeading title="App" />
+        <Section>
+          <div className="divide-y divide-border">
+            <Row
+              icon={<Download className="size-4" />}
+              title="Download app"
+              description={
+                installed
+                  ? "MediTracker is installed on this device."
+                  : installPrompt
+                    ? "Install MediTracker on this device. It opens like a native app and works offline."
+                    : "Add MediTracker to your home screen to use it like a native app."
+              }
+            >
+              {!installed ? (
+                <Button size="sm" variant="outline" onClick={handleInstall}>
+                  {installPrompt ? "Install" : "How to install"}
+                </Button>
+              ) : (
+                <span className="text-sm text-muted-foreground">Installed</span>
+              )}
+            </Row>
+          </div>
+        </Section>
+        <p className="px-1 text-xs leading-relaxed text-muted-foreground">
+          Installed apps keep reminders working the same way as the browser —
+          alerts appear while MediTracker is open. Your data stays on this
+          device either way.
+        </p>
+      </section>
+
       {/* Data */}
       <section className="space-y-3">
         <SectionHeading title="Data" />
@@ -384,6 +462,47 @@ export default function SettingsPage() {
             >
               Delete
             </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={showInstallHelp}
+        onOpenChange={(open) => !open && setShowInstallHelp(false)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Download MediTracker</AlertDialogTitle>
+            <AlertDialogDescription>
+              <div className="space-y-3 text-left text-sm">
+                <div>
+                  <p className="font-medium text-foreground">
+                    Android (Chrome)
+                  </p>
+                  <p>
+                    Open the browser menu (⋮) and choose “Add to Home screen”.
+                  </p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">
+                    iPhone or iPad (Safari)
+                  </p>
+                  <p>Tap Share, then “Add to Home Screen”.</p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">
+                    Desktop (Chrome or Edge)
+                  </p>
+                  <p>
+                    Use the install icon in the address bar, or the browser
+                    menu → “Install MediTracker”.
+                  </p>
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Close</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

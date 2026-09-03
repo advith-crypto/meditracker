@@ -166,3 +166,14 @@ createRoot(document.getElementById("root")!).render(
     </RootErrorBoundary>
   </StrictMode>,
 );
+
+// Register the service worker for offline support and app installability.
+// Dev mode registers a pass-through worker (HMR untouched) that still counts
+// as a fetch handler for Chrome's install criteria; production enables full
+// offline caching. The app works fine without it either way.
+if ("serviceWorker" in navigator && window.isSecureContext) {
+  window.addEventListener("load", () => {
+    const mode = import.meta.env.PROD ? "prod" : "dev";
+    navigator.serviceWorker.register(`/sw.js?mode=${mode}`).catch(() => {});
+  });
+}
