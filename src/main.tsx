@@ -1,3 +1,5 @@
+// MediTracker — local-first medicine reminders & tracking.
+// No backend, no authentication: all data lives in the browser's localStorage.
 import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
 import React, { StrictMode, useEffect, lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
