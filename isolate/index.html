@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#1c1c1c" media="(prefers-color-scheme: dark)" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="MediTracker" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>MediTracker — Daily medicine reminders & tracking</title>
+  <script>
+    // Apply the saved theme before first paint to avoid a flash.
+    try {
+      var raw = localStorage.getItem("medireminder:v1");
+      if (raw) {
+        var data = JSON.parse(raw);
+        var t = data && data.settings && data.settings.theme;
+        var dark =
+          t === "dark" ||
+          (t !== "light" &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches);
+        if (dark) document.documentElement.classList.add("dark");
+      }
+    } catch (e) {}
+  </script>
+  <script type="module" crossorigin src="/assets/index-qOo3shFr.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/framer-motion-D5IBGcks.js">
+  <link rel="modulepreload" crossorigin href="/assets/radix-ui-C6SWyxvn.js">
+  <link rel="modulepreload" crossorigin href="/assets/react-vendor-CjkoAkAo.js">
+  <link rel="stylesheet" crossorigin href="/assets/index-CUtRKkmZ.css">
+</head>
+
+
+<body>
+  <div id="root"></div>
+</body>
+
+</html>
