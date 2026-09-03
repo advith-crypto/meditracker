@@ -1,22 +1,17 @@
-import { useAuthActions } from "@convex-dev/auth/react";
 import {
   Bell,
   Download,
   FlaskConical,
   Info,
-  LogOut,
   Moon,
   Pill,
   ShieldCheck,
   Sun,
   Trash2,
   Monitor,
-  UserRound,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
-import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/use-auth";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -101,22 +96,10 @@ export default function SettingsPage() {
   const db = useDB();
   const s = db.settings;
   const perm = notificationPermission();
-  const { user } = useAuth();
-  const { signOut } = useAuthActions();
-  const navigate = useNavigate();
 
   const [confirm, setConfirm] = useState<
     "clearHistory" | "deleteAll" | null
   >(null);
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      navigate("/");
-    } catch {
-      toast.error("Could not sign out. Please try again.");
-    }
-  };
 
   const themeOptions: { value: ThemePref; label: string; icon: typeof Sun }[] = [
     { value: "light", label: "Light", icon: Sun },
@@ -145,33 +128,9 @@ export default function SettingsPage() {
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Your account, reminders, appearance, data and privacy.
+          Reminders, appearance, data and privacy.
         </p>
       </header>
-
-      {/* Account */}
-      <section className="space-y-3">
-        <SectionHeading title="Account" />
-        <Section>
-          <div className="divide-y divide-border">
-            <Row
-              icon={<UserRound className="size-4" />}
-              title="Signed in as"
-              description={
-                user?.email
-                  ? user.email
-                  : user?.isAnonymous
-                    ? "Guest account — instant access, no email needed"
-                    : "Signed in"
-              }
-            >
-              <Button size="sm" variant="outline" onClick={handleSignOut}>
-                <LogOut className="size-3.5" /> Sign out
-              </Button>
-            </Row>
-          </div>
-        </Section>
-      </section>
 
       {/* Notifications */}
       <section className="space-y-3">

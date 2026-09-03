@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
 import { useDB } from "@/lib/store";
 
 const STEPS = [
@@ -103,14 +102,8 @@ function PhoneMock() {
 export default function Landing() {
   const navigate = useNavigate();
   const db = useDB();
-  const { isAuthenticated, isLoading } = useAuth();
 
   const openApp = () => {
-    if (isLoading) return;
-    if (!isAuthenticated) {
-      navigate("/auth?returnTo=/app");
-      return;
-    }
     navigate(db.settings.onboarded ? "/app" : "/onboarding");
   };
 
@@ -168,7 +161,7 @@ export default function Landing() {
             </div>
             <ul className="mt-8 space-y-2 text-sm text-muted-foreground">
               {[
-                "Sign in with email or jump in as a guest",
+                "No account or sign-up — just open the app",
                 "Your data stays on your device",
                 "Works on phones, tablets and desktop",
               ].map((t) => (
@@ -263,12 +256,12 @@ export default function Landing() {
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
                 Your medicine information never leaves your device. MediTracker
-                stores everything locally, requires no personal data beyond an
-                email if you choose one, and never sends your medicines anywhere.
+                needs no account, collects no personal data, and never sends
+                your medicines anywhere.
               </p>
               <p className="mt-3 flex items-center gap-1.5 text-sm text-muted-foreground">
                 <Sparkles className="size-4" />
-                Guest sign-in works instantly — no email required.
+                No sign-up, no email, no waiting — it just works.
               </p>
             </div>
             <Button size="lg" variant="outline" className="h-12 shrink-0 px-6" onClick={openApp}>
